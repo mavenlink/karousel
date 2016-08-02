@@ -11,6 +11,8 @@ func main() {
 
     config := client.Config{
         Host: "https://localhost:8443",
+        Username: "test",
+        Password: "password",
     }
     c, err := client.New(&config)
     if err != nil {
