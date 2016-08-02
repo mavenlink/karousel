@@ -12,8 +12,6 @@ func main() {
 
     config := restclient.Config {
         Host: "https://192.168.99.100:8443",
-        Username: "test",
-        Password: "password",
     }
     c, err := client.New(&config)
     if err != nil {
