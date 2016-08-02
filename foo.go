@@ -9,7 +9,10 @@ import (
 
 func main() {
   config := &restclient.Config{
-    Host:     "https://192.168.99.112:8443",
+    Host:     "http://192.168.99.112:8081",
+    Username: "admin",
+    Password: "merge4justice",
+    Insecure:  true,
   }
   kubeclient, err := client.New(config)
   if err != nil {
@@ -19,6 +22,7 @@ func main() {
   if err != nil {
     fmt.Printf("%s\n",err)
   }
-  fmt.Printf("%s\n",podlist.Items)
+  fmt.Printf("Pods: %s\n",podlist.Items)
+  fmt.Printf("Connection: %s\n",kubeclient)
   fmt.Printf("%d\n",len(podlist.Items))
 }
