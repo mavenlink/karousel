@@ -1,31 +1,45 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    client "k8s.io/kubernetes/pkg/client/unversioned"
-    "k8s.io/kubernetes/pkg/api"
+	"flag"
+	"fmt"
+	"github.com/spf13/pflag"
+	"k8s.io/kubernetes/pkg/api"
+	kubeClient "k8s.io/kubernetes/pkg/client/restclient"
+	client "k8s.io/kubernetes/pkg/client/unversioned"
+	kubectl_util "k8s.io/kubernetes/pkg/kubectl/cmd/util"
+	"log"
+)
+
+var (
+	flags = pflag.NewFlagSet("", pflag.ExitOnError)
 )
 
 func main() {
+	// config := &restclient.Config{
+	// 	Host:     "https://192.168.99.100:8443",
+	// 	Username: "admin",
+	// 	Password: "merge4justice",
+	// 	Insecure: true,
+	// }
+	clientConfig := kubectl_util.DefaultClientConfig()
 
-    config := client.Config{
-        Host: "https://localhost:8443",
-        Username: "test",
-        Password: "password",
-    }
-    c, err := client.New(&config)
-    if err != nil {
-        log.Fatalln("Can't connect to Kubernetes API:", err)
-    }
+	var err error
+	if *inCluster {
+		kubeClient, err = client.NewInCluster()
+	} else {
+		config, connErr := clientConfig.ClientConfig()
+		if connErr != nil {
+			glog.Fatalf("error connecting to the client: %v", err)
+		}
+		kubeClient, err = client.New(config)
+	}
 
-    s, err := c.Services(api.NamespaceDefault).Get("some-service-name")
-    if err != nil {
-        log.Fatalln("Can't get service:", err)
-    }
-    fmt.Println("Name:", s.Name)
-    for p, _ := range s.Spec.Ports {
-        fmt.Println("Port:", s.Spec.Ports[p].Port)
-        fmt.Println("NodePort:", s.Spec.Ports[p].NodePort)
-    }
-  }
+	podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
+	if err != nil {
+		log.Fatalln("Can't get pods:", err)
+	}
+	fmt.Printf("Pods: %s\n", podlist.Items)
+	// fmt.Printf("Connection: %s\n", kubeclient)
+	// fmt.Printf("%d\n", len(podlist.Items))
+}
