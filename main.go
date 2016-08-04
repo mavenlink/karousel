@@ -7,7 +7,8 @@ import (
 	"k8s.io/kubernetes/pkg/client/restclient"
 	client "k8s.io/kubernetes/pkg/client/unversioned"
 	kubectl_util "k8s.io/kubernetes/pkg/kubectl/cmd/util"
-	"log"
+	// "log"
+	"net/http"
 	"os"
 )
 
@@ -21,33 +22,38 @@ var (
 		`Enforce CA check for cert`)
 )
 
-func main() {
+func getPods(w http.ResponseWriter, r *http.Request) {
 	clientConfig := kubectl_util.DefaultClientConfig(flags)
 
-	flags.Parse(os.Args)
+	// flags.Parse(os.Args)
 
 	config := &restclient.Config{
 		Host:     *host,
 		Insecure: *insecure,
 	}
-	var err error
-	// if *inCluster {
-	// 	kubeClient, err := client.NewInCluster()
-	// } else {
-	// 	config, connErr := clientConfig.ClientConfig()
-	// 	if connErr != nil {
-	// 		log.Fatalf("error connecting to the client: %v", err)
-	// 	}
-	// 	kubeClient, err := client.New(config)
-	// }
-	config, err = clientConfig.ClientConfig()
 
+	var err error
+
+	config, err = clientConfig.ClientConfig()
+	check(err)
 	kubeClient, err := client.New(config)
+	check(err)
 	podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
+	check(err)
+
+	fmt.Fprintf(w, "Pods: %s\n", html.EscapeString(r.podlist.Items))
+	fmt.Fprintf(w, "Connection: %s\n", html.EscapeString(r.kubeClient))
+}
+
+func check(err error) {
 	if err != nil {
-		log.Fatalln("Can't get pods:", err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
-	fmt.Printf("Pods: %s\n", podlist.Items)
-	fmt.Printf("Connection: %s\n", kubeClient)
-	fmt.Printf("%d\n", len(podlist.Items))
+}
+
+func main() {
+	http.HandleFunc("/", getPods) // set route to get pods
+	err := http.ListenAndServe(":9090", nil)
+	check(err)
 }
