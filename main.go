@@ -1,6 +1,7 @@
 package main
 
 import (
+	// "encoding/json"
 	"fmt"
 	flag "github.com/spf13/pflag"
 	"k8s.io/kubernetes/pkg/api"
@@ -8,7 +9,7 @@ import (
 	client "k8s.io/kubernetes/pkg/client/unversioned"
 	kubectl_util "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 	// "log"
-	"net/http"
+	// "net/http"
 	"os"
 )
 
@@ -22,7 +23,9 @@ var (
 		`Enforce CA check for cert`)
 )
 
-func getPods(w http.ResponseWriter, r *http.Request) {
+type itemdata [][]string
+
+func getPods() {
 	clientConfig := kubectl_util.DefaultClientConfig(flags)
 
 	// flags.Parse(os.Args)
@@ -33,6 +36,7 @@ func getPods(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var err error
+	// var datas itemdata
 
 	config, err = clientConfig.ClientConfig()
 	check(err)
@@ -40,9 +44,12 @@ func getPods(w http.ResponseWriter, r *http.Request) {
 	check(err)
 	podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
 	check(err)
-
-	fmt.Fprintf(w, "Pods: %s\n", html.EscapeString(r.podlist.Items))
-	fmt.Fprintf(w, "Connection: %s\n", html.EscapeString(r.kubeClient))
+	for _, pod := range podlist.Items {
+		fmt.Println(pod.Name)
+		fmt.Println(pod.Status)
+	}
+	// fmt.Fprintf("Pods: %s\n", podlist.Items)
+	// fmt.Fprintf(w, "Connection: %s\n", html.EscapeString(r.kubeClient))
 }
 
 func check(err error) {
@@ -53,7 +60,8 @@ func check(err error) {
 }
 
 func main() {
-	http.HandleFunc("/", getPods) // set route to get pods
-	err := http.ListenAndServe(":9090", nil)
-	check(err)
+	// http.HandleFunc("/", getPods) // set route to get pods
+	// err := http.ListenAndServe(":9090", nil)
+	// check(err)
+	getPods()
 }
