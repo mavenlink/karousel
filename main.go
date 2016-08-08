@@ -29,7 +29,7 @@ var (
 
 type itemdata [][]string
 
-func getPods() {
+func getPodsToKill() {
 	clientConfig := kubectl_util.DefaultClientConfig(flags)
 
 	// flags.Parse(os.Args)
@@ -54,11 +54,15 @@ func getPods() {
 		// startTime := pod.Status.StartTime
 		//diff := currentTime.Sub(startTime)
 		fmt.Println(pod.Name)
-		fmt.Println(pod.Labels)
+		fmt.Println(pod.Labels["ttl"])
 		fmt.Println(startTime)
 		fmt.Println(reflect.TypeOf(startTime))
 		fmt.Println("Current time:", currentTime)
+		fmt.Println(currentTime.Sub(startTime.Time))
 	}
+}
+
+func killPods() {
 }
 
 func check(err error) {
@@ -72,5 +76,5 @@ func main() {
 	// http.HandleFunc("/", getPods) // set route to get pods
 	// err := http.ListenAndServe(":9090", nil)
 	// check(err)
-	getPods()
+	getPodsToKill()
 }
