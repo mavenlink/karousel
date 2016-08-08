@@ -3,6 +3,7 @@ package main
 import (
 	// "encoding/json"
 	"fmt"
+	"reflect"
 
 	flag "github.com/spf13/pflag"
 	"k8s.io/kubernetes/pkg/api"
@@ -13,6 +14,7 @@ import (
 	// "log"
 	// "net/http"
 	"os"
+	"time"
 )
 
 var (
@@ -38,7 +40,6 @@ func getPods() {
 	}
 
 	var err error
-	// var datas itemdata
 
 	config, err = clientConfig.ClientConfig()
 	check(err)
@@ -46,16 +47,18 @@ func getPods() {
 	check(err)
 	podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
 	check(err)
+
 	for _, pod := range podlist.Items {
+		currentTime := time.Now()
+		startTime := pod.Status.StartTime
+		// startTime := pod.Status.StartTime
+		//diff := currentTime.Sub(startTime)
 		fmt.Println(pod.Name)
-		ttl := map[pod.Labels]string
-		fmt.Println(ttl)
-		fmt.Println(pod.Status.StartTime)
-		// fmt.Println(pod)
-		// fmt.Printf("%q\n", strings.Split(pod.Status, " "))
+		fmt.Println(pod.Labels)
+		fmt.Println(startTime)
+		fmt.Println(reflect.TypeOf(startTime))
+		fmt.Println("Current time:", currentTime)
 	}
-	// fmt.Fprintf("Pods: %s\n", podlist.Items)
-	// fmt.Fprintf(w, "Connection: %s\n", html.EscapeString(r.kubeClient))
 }
 
 func check(err error) {
