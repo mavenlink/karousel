@@ -3,11 +3,13 @@ package main
 import (
 	// "encoding/json"
 	"fmt"
+
 	flag "github.com/spf13/pflag"
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/client/restclient"
 	client "k8s.io/kubernetes/pkg/client/unversioned"
 	kubectl_util "k8s.io/kubernetes/pkg/kubectl/cmd/util"
+	// "strings"
 	// "log"
 	// "net/http"
 	"os"
@@ -46,7 +48,11 @@ func getPods() {
 	check(err)
 	for _, pod := range podlist.Items {
 		fmt.Println(pod.Name)
-		fmt.Println(pod.Status)
+		ttl := map[pod.Labels]string
+		fmt.Println(ttl)
+		fmt.Println(pod.Status.StartTime)
+		// fmt.Println(pod)
+		// fmt.Printf("%q\n", strings.Split(pod.Status, " "))
 	}
 	// fmt.Fprintf("Pods: %s\n", podlist.Items)
 	// fmt.Fprintf(w, "Connection: %s\n", html.EscapeString(r.kubeClient))
