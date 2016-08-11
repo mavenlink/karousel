@@ -3,14 +3,14 @@ package main
 import (
 	// "encoding/json"
 	"fmt"
-	"reflect"
+	// "reflect"
 
 	flag "github.com/spf13/pflag"
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/client/restclient"
 	client "k8s.io/kubernetes/pkg/client/unversioned"
 	kubectl_util "k8s.io/kubernetes/pkg/kubectl/cmd/util"
-	// "strings"
+	"strconv"
 	// "log"
 	// "net/http"
 	"os"
@@ -51,14 +51,17 @@ func getPodsToKill() {
 	for _, pod := range podlist.Items {
 		currentTime := time.Now()
 		startTime := pod.Status.StartTime
-		// startTime := pod.Status.StartTime
-		//diff := currentTime.Sub(startTime)
-		fmt.Println(pod.Name)
-		fmt.Println(pod.Labels["ttl"])
-		fmt.Println(startTime)
-		fmt.Println(reflect.TypeOf(startTime))
-		fmt.Println("Current time:", currentTime)
-		fmt.Println(currentTime.Sub(startTime.Time))
+		ttl, err := strconv.ParseFloat(pod.Labels["ttl"], 64)
+		check(err)
+
+		podAge := currentTime.Sub(startTime.Time)
+		podAgeHours := podAge.Hours()
+		if podAgeHours > ttl {
+			fmt.Println("Attempting to kill pod", pod.Name, "it is older then", ttl, "hours")
+			// killPods(pod.Name)
+		} else {
+			fmt.Println("Pod", pod.Name, "is younger then", ttl, "hours")
+		}
 	}
 }
 
