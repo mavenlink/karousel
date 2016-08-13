@@ -58,14 +58,15 @@ func getPodsToKill() {
 		podAgeHours := podAge.Hours()
 		if podAgeHours > ttl {
 			fmt.Println("Attempting to kill pod", pod.Name, "it is older then", ttl, "hours")
-			// killPods(pod.Name)
+			killPods(pod.Name)
 		} else {
 			fmt.Println("Pod", pod.Name, "is younger then", ttl, "hours")
 		}
 	}
 }
 
-func killPods() {
+func killPods(pod string) {
+	fmt.Println("Killed", pod, "!")
 }
 
 func check(err error) {
