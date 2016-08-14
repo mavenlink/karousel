@@ -35,31 +35,33 @@ func main() {
 		log.Fatalf("failed to create client: %v", err)
 	}
 
-	podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
-	if err != nil {
-		log.Fatalf("failed list pods: %v", err)
-	}
-
-	for _, pod := range podlist.Items {
-		currentTime := time.Now()
-		startTime := pod.Status.StartTime
-		ttl, err := strconv.ParseFloat(pod.Labels["ttl"], 64)
+	for {
+		podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
 		if err != nil {
-			log.Printf("failed parse label ttl: %v", err)
-			continue
+			log.Fatalf("failed list pods: %v", err)
 		}
 
-		podAge := currentTime.Sub(startTime.Time)
-		podAgeHours := podAge.Hours()
-		if podAgeHours <= ttl {
-			log.Println("Pod", pod.Name, "is younger then", ttl, "hours")
-			continue
-		}
+		for _, pod := range podlist.Items {
+			currentTime := time.Now()
+			startTime := pod.Status.StartTime
+			ttl, err := strconv.ParseFloat(pod.Labels["ttl"], 64)
+			if err != nil {
+				log.Printf("failed parse label ttl: %v", err)
+				continue
+			}
 
-		fmt.Println("Attempting to kill pod", pod.Name, "it is older then", ttl, "hours")
-		err = kubeClient.Pods(pod.Namespace).Delete(pod.Name, &api.DeleteOptions{})
-		if err != nil {
-			log.Printf("Pod %v was deleted\n", pod)
+			podAge := currentTime.Sub(startTime.Time)
+			podAgeHours := podAge.Hours()
+			if podAgeHours <= ttl {
+				log.Println("Pod", pod.Name, "is younger then", ttl, "hours")
+				continue
+			}
+
+			fmt.Println("Attempting to kill pod", pod.Name, "it is older then", ttl, "hours")
+			err = kubeClient.Pods(pod.Namespace).Delete(pod.Name, &api.DeleteOptions{})
+			if err != nil {
+				log.Printf("Pod %v was deleted\n", pod)
+			}
 		}
 	}
 }
