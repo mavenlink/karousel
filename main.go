@@ -57,11 +57,29 @@ func main() {
 				continue
 			}
 
+			// Delete Pod
 			fmt.Println("Attempting to kill pod", pod.Name, "it is older then", ttl, "hours")
 			err = kubeClient.Pods(pod.Namespace).Delete(pod.Name, &api.DeleteOptions{})
 			if err != nil {
 				log.Printf("Pod %v was deleted\n", pod)
 			}
+
+			// Delete Service
+			serviceList, err := kubeClient.Services(api.NamespaceDefault).List(api.ListOptions{})
+			if err != nil {
+				log.Fatalf("failed to list services: %v", err)
+			}
+
+			for _, service := range serviceList.Items {
+				servicePod := service.Labels["pod"]
+				if servicePod == pod.Name {
+					err = kubeClient.Services(pod.Namespace).Delete(service.Name)
+					if err != nil {
+						log.Printf("service %v was deleted\n", pod)
+					}
+				}
+			}
+
 		}
 	}
 }
