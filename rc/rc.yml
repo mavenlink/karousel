@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: karousel
+spec:
+  replicas: 1
+  selector:
+    app: karousel
+  template:
+    metadata:
+      name: karousel
+      labels:
+        app: karousel
+    spec:
+      containers:
+      - name: karousel
+        image: armandocerna/karousel:latest

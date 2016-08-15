@@ -1,2 +1,2 @@
 FROM scratch
-ADD karousel /karousel
+ADD main /karousel
