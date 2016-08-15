@@ -46,7 +46,7 @@ func main() {
 			startTime := pod.Status.StartTime
 			ttl, err := strconv.ParseFloat(pod.Labels["ttl"], 64)
 			if err != nil {
-				log.Printf("failed parse label ttl: %v", err)
+				// log.Printf("failed parse label ttl: %v", err)
 				continue
 			}
 
