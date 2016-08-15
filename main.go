@@ -71,8 +71,9 @@ func main() {
 			}
 
 			for _, service := range serviceList.Items {
-				servicePod := service.Labels["pod"]
-				if servicePod == pod.Name {
+				// servicePod := service.Labels["pod"]
+				serviceSelector := service.Spec.Selector["name"]
+				if serviceSelector == pod.Name {
 					err = kubeClient.Services(pod.Namespace).Delete(service.Name)
 					if err != nil {
 						log.Printf("service %v was deleted\n", pod)
