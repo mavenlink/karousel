@@ -38,7 +38,7 @@ func main() {
 	for {
 		podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
 		if err != nil {
-			log.Fatalf("failed list pods: %v", err)
+			log.Fatalf("failed list the pods: %v", err)
 		}
 
 		for _, pod := range podlist.Items {
