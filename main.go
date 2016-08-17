@@ -21,6 +21,7 @@ var (
 )
 
 func main() {
+	fmt.Println("Instastage Started...Please stand by for ascension")
 	flags.AddGoFlagSet(flag.CommandLine)
 	flags.Parse(os.Args)
 	clientConfig := kubectl_util.DefaultClientConfig(flags)
@@ -35,14 +36,16 @@ func main() {
 		log.Fatalf("failed to create client: %v", err)
 	}
 
+	currentTime := time.Now()
+
 	for {
+		// Get pods to delete
 		podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
 		if err != nil {
 			log.Fatalf("(2)failed list pods: %v", err)
 		}
 
 		for _, pod := range podlist.Items {
-			currentTime := time.Now()
 			startTime := pod.Status.StartTime
 			ttl, err := strconv.ParseFloat(pod.Labels["ttl"], 64)
 			if err != nil {
@@ -63,24 +66,61 @@ func main() {
 			if err != nil {
 				log.Printf("Pod %v was deleted\n", pod)
 			}
+		}
+
+		// Get service to delete
+		servicelist, err := kubeClient.Services(api.NamespaceDefault).List(api.ListOptions{})
+		if err != nil {
+			log.Fatalf("(2)failed list service: %v", err)
+		}
+
+		for _, service := range servicelist.Items {
+			ttl, err := strconv.ParseFloat(service.Labels["ttl"], 64)
+			if err != nil {
+				// log.Printf("failed parse label ttl: %v", err)
+				continue
+			}
+			serviceAge := unversioned.time.Now.Sub(service.GetCreationTimestamp())
+			// serviceAge := currentTime.Sub(service.GetCreationTimestamp)
+			if serviceAge.Hours() <= ttl {
+				log.Println("Service", service.Name, "is younger then", ttl, "hours")
+				continue
+			}
 
 			// Delete Service
-			serviceList, err := kubeClient.Services(api.NamespaceDefault).List(api.ListOptions{})
+			fmt.Println("Attempting to kill service", service.Name, "it is older then", ttl, "hours")
+			err = kubeClient.Services(service.Namespace).Delete(service.Name, &api.DeleteOptions{})
 			if err != nil {
-				log.Fatalf("failed to list services: %v", err)
+				log.Printf("Service %v was deleted\n", service.Name)
 			}
-
-			for _, service := range serviceList.Items {
-				// servicePod := service.Labels["pod"]
-				serviceSelector := service.Spec.Selector["name"]
-				if serviceSelector == pod.Name {
-					err = kubeClient.Services(pod.Namespace).Delete(service.Name)
-					if err != nil {
-						log.Printf("service %v was deleted\n", pod)
-					}
-				}
-			}
-
 		}
+
+		// // Get ingress to delete
+		// ingresslist, err := kubeClient.Ingress(api.NamespaceDefault).List(api.ListOptions{})
+		// if err != nil {
+		// 	log.Fatalf("(2)failed list ingress: %v", err)
+		// }
+
+		// for _, ingress := range ingresslist.Items {
+		// 	ttl, err := strconv.ParseFloat(ingress.Labels["ttl"], 64)
+		// 	if err != nil {
+		// 		// log.Printf("failed parse label ttl: %v", err)
+		// 		continue
+		// 	}
+
+		// 	ingressAge := currentTime.Sub(ingress.Status.StartTime)
+		// 	if ingressAge.Hours() <= ttl {
+		// 		log.Println("Ingress", ingress.Name, "is younger then", ttl, "hours")
+		// 		continue
+		// 	}
+
+		// 	// Delete Ingress
+		// 	fmt.Println("Attempting to kill ingress", ingress.Name, "it is older then", ttl, "hours")
+		// 	err = kubeClient.Ingress(ingress.Namespace).Delete(ingress.Name, &api.DeleteOptions{})
+		// 	if err != nil {
+		// 		log.Printf("Ingress %v was deleted\n", ingress.Name)
+		// 	}
+		// }
+
 	}
 }
