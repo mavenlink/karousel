@@ -9,3 +9,16 @@ spec:
   containers:
   - name: nginx
     image: nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3002
+    protocol: TCP
+  selector:
+    name: foo
+
