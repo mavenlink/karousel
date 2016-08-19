@@ -4,8 +4,6 @@ metadata:
   name: karousel
 spec:
   replicas: 1
-  selector:
-    app: karousel
   template:
     metadata:
       name: karousel
