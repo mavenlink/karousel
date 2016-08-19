@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	// "github.com/golang/glog"
 	"github.com/spf13/pflag"
 
 	"k8s.io/kubernetes/pkg/api"
@@ -31,7 +30,6 @@ func deletePod(kubeClient *unversioned.Client) {
 		startTime := pod.Status.StartTime
 		ttl, err := strconv.ParseFloat(pod.Labels["ttl"], 64)
 		if err != nil {
-			// log.Printf("failed parse label ttl: %v", err)
 			continue
 		}
 
@@ -61,7 +59,6 @@ func deleteService(kubeClient *unversioned.Client) {
 	for _, service := range servicelist.Items {
 		ttl, err := strconv.ParseFloat(service.Labels["ttl"], 64)
 		if err != nil {
-			// log.Printf("failed parse label ttl: %v", err)
 			continue
 		}
 		serviceCreation := service.GetCreationTimestamp().Time
@@ -90,7 +87,6 @@ func deleteIngress(kubeClient *unversioned.Client) {
 	for _, ingress := range ingresslist.Items {
 		ttl, err := strconv.ParseFloat(ingress.Labels["ttl"], 64)
 		if err != nil {
-			// log.Printf("failed parse label ttl: %v", err)
 			continue
 		}
 		ingressCreation := ingress.GetCreationTimestamp().Time
@@ -102,7 +98,6 @@ func deleteIngress(kubeClient *unversioned.Client) {
 
 		// Delete Ingress
 		fmt.Println("Attempting to kill ingress", ingress.Name, "it is older then", ttl, "hours")
-		// err = kubeClient.Ingress(ingress.Namespace).Delete(ingress.Name)
 		err = kubeClient.Ingress(ingress.Namespace).Delete(ingress.Name, &api.DeleteOptions{})
 		if err != nil {
 			log.Printf("Ingress %v was deleted\n", ingress.Name)
@@ -111,7 +106,7 @@ func deleteIngress(kubeClient *unversioned.Client) {
 }
 
 func main() {
-	fmt.Println("Instastage Started...Please stand by for ascension")
+	fmt.Println("Karousel Started...Please stand by for ascension")
 	flags.AddGoFlagSet(flag.CommandLine)
 	flags.Parse(os.Args)
 	clientConfig := kubectl_util.DefaultClientConfig(flags)
