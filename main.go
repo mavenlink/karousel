@@ -130,33 +130,5 @@ func main() {
 		deletePod(kubeClient)
 		deleteService(kubeClient)
 		deleteIngress(kubeClient)
-
-		// // Get ingress to delete
-		// ingresslist, err := kubeClient.Ingress(api.NamespaceDefault).List(api.ListOptions{})
-		// if err != nil {
-		// 	log.Fatalf("(2)failed list ingress: %v", err)
-		// }
-
-		// for _, ingress := range ingresslist.Items {
-		// 	ttl, err := strconv.ParseFloat(ingress.Labels["ttl"], 64)
-		// 	if err != nil {
-		// 		// log.Printf("failed parse label ttl: %v", err)
-		// 		continue
-		// 	}
-
-		// 	ingressAge := currentTime.Sub(ingress.Status.StartTime)
-		// 	if ingressAge.Hours() <= ttl {
-		// 		log.Println("Ingress", ingress.Name, "is younger then", ttl, "hours")
-		// 		continue
-		// 	}
-
-		// 	// Delete Ingress
-		// 	fmt.Println("Attempting to kill ingress", ingress.Name, "it is older then", ttl, "hours")
-		// 	err = kubeClient.Ingress(ingress.Namespace).Delete(ingress.Name, &api.DeleteOptions{})
-		// 	if err != nil {
-		// 		log.Printf("Ingress %v was deleted\n", ingress.Name)
-		// 	}
-		// }
-
 	}
 }
