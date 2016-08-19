@@ -125,5 +125,6 @@ func main() {
 		deletePod(kubeClient)
 		deleteService(kubeClient)
 		deleteIngress(kubeClient)
+		time.Sleep(300 * time.Second)
 	}
 }
