@@ -16,7 +16,8 @@ import (
 )
 
 var (
-	flags = pflag.NewFlagSet("", pflag.ExitOnError)
+	flags   = pflag.NewFlagSet("", pflag.ExitOnError)
+	Version = "No Version Provided"
 )
 
 func deletePod(kubeClient *unversioned.Client) {
@@ -106,7 +107,7 @@ func deleteIngress(kubeClient *unversioned.Client) {
 }
 
 func main() {
-	fmt.Println("Karousel Started...Please stand by for ascension")
+	fmt.Printf("Karousel(%s) Started...Please stand by for ascension\n", Version)
 	flags.AddGoFlagSet(flag.CommandLine)
 	flags.Parse(os.Args)
 	clientConfig := kubectl_util.DefaultClientConfig(flags)
