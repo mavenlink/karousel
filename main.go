@@ -37,7 +37,7 @@ func deletePod(kubeClient *unversioned.Client) {
 		podAge := time.Now().Sub(startTime.Time)
 		podAgeHours := podAge.Hours()
 		if podAgeHours <= ttl {
-			log.Println("Pod", pod.Name, "is", podAge.Hours(), "hours old, it will be deleted in", ttl, "hours")
+			log.Println("Pod", pod.Name, "is", int(podAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
 			continue
 		}
 
@@ -65,7 +65,7 @@ func deleteService(kubeClient *unversioned.Client) {
 		serviceCreation := service.GetCreationTimestamp().Time
 		serviceAge := time.Now().Sub(serviceCreation)
 		if serviceAge.Hours() <= ttl {
-			log.Println("Service", service.Name, "is", serviceAge.Hours(), "hours old, it will be deleted in", ttl, "hours")
+			log.Println("Service", service.Name, "is", int(serviceAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
 			continue
 		}
 
@@ -93,7 +93,7 @@ func deleteIngress(kubeClient *unversioned.Client) {
 		ingressCreation := ingress.GetCreationTimestamp().Time
 		ingressAge := time.Now().Sub(ingressCreation)
 		if ingressAge.Hours() <= ttl {
-			log.Println("Ingress", ingress.Name, "is", ingressAge.Hours(), "hours old, it will be deleted in", ttl, "hours")
+			log.Println("Ingress", ingress.Name, "is", int(ingressAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
 			continue
 		}
 
