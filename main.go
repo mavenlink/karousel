@@ -20,6 +20,36 @@ var (
 	Version = "No Version Provided"
 )
 
+func deleteDeployment(kubeClient *unversioned.Client) {
+	// Get deployments to delete
+	deploymentlist, err := kubeClient.Deployments(api.NamespaceDefault).List(api.ListOptions{})
+	if err != nil {
+		log.Fatalf("(2)failed list deployments: %v", err)
+	}
+
+	for _, deployment := range deploymentlist.Items {
+		startTime := deployment.GetCreationTimestamp()
+		ttl, err := strconv.ParseFloat(deployment.Labels["ttl"], 64)
+		if err != nil {
+			continue
+		}
+
+		deploymentAge := time.Now().Sub(startTime.Time)
+		deploymentAgeHours := deploymentAge.Hours()
+		if deploymentAgeHours <= ttl {
+			log.Println("Pod", deployment.Name, "is", int(deploymentAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
+			continue
+		}
+
+		// Delete Deployment
+		fmt.Println("Attempting to kill deployment", deployment.Name, "it is older then", ttl, "hours")
+		err = kubeClient.Deployments(deployment.Namespace).Delete(deployment.Name, &api.DeleteOptions{})
+		if err != nil {
+			log.Printf("Deployment %v was deleted\n", deployment.Name)
+		}
+	}
+}
+
 func deletePod(kubeClient *unversioned.Client) {
 	// Get pods to delete
 	podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
@@ -123,6 +153,7 @@ func main() {
 	}
 
 	for {
+		deleteDeployment(kubeClient)
 		deletePod(kubeClient)
 		deleteService(kubeClient)
 		deleteIngress(kubeClient)
