@@ -43,7 +43,8 @@ func deleteDeployment(kubeClient *unversioned.Client) {
 
 		// Delete Deployment
 		fmt.Println("Attempting to kill deployment", deployment.Name, "it is older then", ttl, "hours")
-		err = kubeClient.Deployments(deployment.Namespace).Delete(deployment.Name, &api.DeleteOptions{})
+		err = kubeClient.Deployments(deployment.Namespace).Delete(deployment.Name, &api.DeleteOptions{OrphanDependents: false})
+
 		if err != nil {
 			log.Printf("Deployment %v was deleted\n", deployment.Name)
 		}
