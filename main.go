@@ -51,7 +51,7 @@ func deleteDeployment(kubeClient *unversioned.Client) {
 		if err != nil {
 			log.Printf("Deployment %v was deleted\n", deployment.Name)
 		} else {
-			fmt.Println(err)
+			fmt.Printf("Error %s" err)
 		}
 	}
 }
