@@ -10,9 +10,9 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/client/unversioned"
-	kubectl_util "k8s.io/kubernetes/pkg/kubectl/cmd/util"
+	"k8s.io/client-go/1.4/kubernetes"
+	"k8s.io/client-go/1.4/tools/clientcmd"
+	"k8s.io/client-go/1.4/tools/clientcmd/api"
 )
 
 var (
@@ -20,7 +20,7 @@ var (
 	Version = "No Version Provided"
 )
 
-func deleteDeployment(kubeClient *unversioned.Client) {
+func deleteDeployment(kubeClient) {
 	// Get deployments to delete
 	deploymentlist, err := kubeClient.Deployments(api.NamespaceDefault).List(api.ListOptions{})
 	if err != nil {
@@ -52,7 +52,7 @@ func deleteDeployment(kubeClient *unversioned.Client) {
 	}
 }
 
-func deleteReplicaSet(kubeClient *unversioned.Client) {
+func deleteReplicaSet(kubeClient *kubernetes.Client) {
 	// Get Replica Sets to delete
 	rslist, err := kubeClient.ReplicaSets(api.NamespaceDefault).List(api.ListOptions{})
 	if err != nil {
@@ -84,7 +84,7 @@ func deleteReplicaSet(kubeClient *unversioned.Client) {
 	}
 }
 
-func deletePod(kubeClient *unversioned.Client) {
+func deletePod(kubeClient *clientcmd.Client) {
 	// Get pods to delete
 	podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
 	if err != nil {
@@ -114,7 +114,7 @@ func deletePod(kubeClient *unversioned.Client) {
 	}
 }
 
-func deleteService(kubeClient *unversioned.Client) {
+func deleteService(kubeClient *kubernetes.Client) {
 	// Get service to delete
 	servicelist, err := kubeClient.Services(api.NamespaceDefault).List(api.ListOptions{})
 	if err != nil {
@@ -142,7 +142,7 @@ func deleteService(kubeClient *unversioned.Client) {
 	}
 }
 
-func deleteIngress(kubeClient *unversioned.Client) {
+func deleteIngress(kubeClient *kubernetes.Client) {
 	// Get ingress to delete
 	ingresslist, err := kubeClient.Ingress(api.NamespaceDefault).List(api.ListOptions{})
 	if err != nil {
@@ -174,14 +174,14 @@ func main() {
 	fmt.Printf("Karousel(%s) Started...Please stand by for ascension\n", Version)
 	flags.AddGoFlagSet(flag.CommandLine)
 	flags.Parse(os.Args)
-	clientConfig := kubectl_util.DefaultClientConfig(flags)
+	clientConfig := clientcmd.DefaultClientConfig(flags)
 
 	config, err := clientConfig.ClientConfig()
 	if err != nil {
 		log.Fatalf("error connecting to the client: %v", err)
 	}
 
-	kubeClient, err := unversioned.New(config)
+	kubeClient := kubernetes.NewForConfig(config)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
