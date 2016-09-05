@@ -9,7 +9,6 @@ import (
 
 	"k8s.io/client-go/1.4/kubernetes"
 	"k8s.io/client-go/1.4/pkg/api"
-	"k8s.io/client-go/1.4/pkg/api/unversioned"
 	"k8s.io/client-go/1.4/rest"
 )
 
@@ -18,19 +17,19 @@ var (
 )
 
 func deleteResource(kubeClient *kubernetes.Clientset, resourceType string) {
+	var (
+		err  error
+		list *kubernetes.ServiceInterface
+	)
 	switch resourceType {
 	case "pod":
 		list, err := kubeClient.Core().Pods("").List(api.ListOptions{})
 	case "service":
 		list, err := kubeClient.Core().Services("").List(api.ListOptions{})
 	case "deployment":
-		// list, err := kubeClient.Core().Deployments("").List(api.ListOptions{})
-		// list, err := kubeClient.Deployments("").List(api.ListOptions{})
-		list, err := kubeClient.Get().Resource("depoyment").List
+		list, err := kubeClient.Deployments("").List(api.ListOptions{})
 	case "ingress":
-		// list, err := kubeClient.Core().Ingress("").List(api.ListOptions{})
-		// list, err := kubeClient.Ingress("").List(api.ListOptions{})
-		list, err := unversioned.Depl
+		list, err := kubeClient.Ingresses("").List(api.ListOptions{})
 	}
 	if err != nil {
 		panic(err.Error())
@@ -60,7 +59,7 @@ func deleteResource(kubeClient *kubernetes.Clientset, resourceType string) {
 		case "deployment":
 			err = kubeClient.Deployments(resource.Namespace).Delete(resource.Name, &api.DeleteOptions{})
 		case "ingress":
-			err = kubeClient.Ingress(resource.Namespace).Delete(resource.Name, &api.DeleteOptions{})
+			err = kubeClient.Ingresses(resource.Namespace).Delete(resource.Name, &api.DeleteOptions{})
 		}
 
 		if err != nil {
@@ -81,7 +80,7 @@ func main() {
 	}
 	fmt.Printf("Value: %v Error: %v", kubeClient, err)
 	for {
-		deleteResource(kubeClient, "pods")
+		deleteResource(kubeClient, "pod")
 		// time.Sleep(300 * time.Second)
 	}
 }
