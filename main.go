@@ -9,6 +9,7 @@ import (
 
 	"k8s.io/client-go/1.4/kubernetes"
 	"k8s.io/client-go/1.4/pkg/api"
+	"k8s.io/client-go/1.4/pkg/api/unversioned"
 	"k8s.io/client-go/1.4/rest"
 )
 
@@ -23,9 +24,13 @@ func deleteResource(kubeClient *kubernetes.Clientset, resourceType string) {
 	case "service":
 		list, err := kubeClient.Core().Services("").List(api.ListOptions{})
 	case "deployment":
-		list, err := kubeClient.Core().Deployments("").List(api.ListOptions{})
+		// list, err := kubeClient.Core().Deployments("").List(api.ListOptions{})
+		// list, err := kubeClient.Deployments("").List(api.ListOptions{})
+		list, err := kubeClient.Get().Resource("depoyment").List
 	case "ingress":
-		list, err := kubeClient.Core().Ingress("").List(api.ListOptions{})
+		// list, err := kubeClient.Core().Ingress("").List(api.ListOptions{})
+		// list, err := kubeClient.Ingress("").List(api.ListOptions{})
+		list, err := unversioned.Depl
 	}
 	if err != nil {
 		panic(err.Error())
@@ -76,7 +81,7 @@ func main() {
 	}
 	fmt.Printf("Value: %v Error: %v", kubeClient, err)
 	for {
-		deletePod(kubeClient, "pods")
+		deleteResource(kubeClient, "pods")
 		// time.Sleep(300 * time.Second)
 	}
 }
