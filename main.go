@@ -142,5 +142,6 @@ func main() {
 		deletePods(kubeClient)
 		deleteServices(kubeClient)
 		deleteIngresses(kubeClient)
+		time.Sleep(time.Second * 300)
 	}
 }
