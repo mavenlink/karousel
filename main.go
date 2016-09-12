@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	// "os"
 	"strconv"
 	"time"
 
@@ -100,7 +99,7 @@ func deleteDeployments(kubeClient *kubernetes.Clientset) {
 }
 
 func deleteIngresses(kubeClient *kubernetes.Clientset) {
-	list, err := kubeClient.Deployments("").List(api.ListOptions{})
+	list, err := kubeClient.Ingresses("").List(api.ListOptions{})
 	if err != nil {
 		panic(err.Error())
 	}
