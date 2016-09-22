@@ -29,6 +29,9 @@ func deleteDeployment(kubeClient *unversioned.Client) {
 
 	for _, deployment := range deploymentlist.Items {
 		startTime := deployment.GetCreationTimestamp()
+		if startTime.IsZero() {
+			continue
+		}
 		ttl, err := strconv.ParseFloat(deployment.Labels["ttl"], 64)
 		if err != nil {
 			continue
@@ -61,6 +64,9 @@ func deleteReplicaSet(kubeClient *unversioned.Client) {
 
 	for _, rs := range rslist.Items {
 		startTime := rs.GetCreationTimestamp()
+		if startTime.IsZero() {
+			continue
+		}
 		ttl, err := strconv.ParseFloat(rs.Labels["ttl"], 64)
 		if err != nil {
 			continue
@@ -93,6 +99,9 @@ func deletePod(kubeClient *unversioned.Client) {
 
 	for _, pod := range podlist.Items {
 		startTime := pod.Status.StartTime
+		if startTime.IsZero() {
+			continue
+		}
 		ttl, err := strconv.ParseFloat(pod.Labels["ttl"], 64)
 		if err != nil {
 			continue
@@ -127,6 +136,9 @@ func deleteService(kubeClient *unversioned.Client) {
 			continue
 		}
 		serviceCreation := service.GetCreationTimestamp().Time
+		if serviceCreation.IsZero() {
+			continue
+		}
 		serviceAge := time.Now().Sub(serviceCreation)
 		if serviceAge.Hours() <= ttl {
 			log.Println("Service", service.Name, "is", int(serviceAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
@@ -155,6 +167,9 @@ func deleteIngress(kubeClient *unversioned.Client) {
 			continue
 		}
 		ingressCreation := ingress.GetCreationTimestamp().Time
+		if ingressCreation.IsZero() {
+			continue
+		}
 		ingressAge := time.Now().Sub(ingressCreation)
 		if ingressAge.Hours() <= ttl {
 			log.Println("Ingress", ingress.Name, "is", int(ingressAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
