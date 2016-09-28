@@ -1,147 +1,212 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
-	"k8s.io/client-go/1.4/kubernetes"
-	"k8s.io/client-go/1.4/pkg/api"
-	"k8s.io/client-go/1.4/rest"
+	"github.com/spf13/pflag"
+
+	"k8s.io/kubernetes/pkg/api"
+	"k8s.io/kubernetes/pkg/client/unversioned"
+	kubectl_util "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 )
 
 var (
+	flags   = pflag.NewFlagSet("", pflag.ExitOnError)
 	Version = "No Version Provided"
 )
 
-func deletePods(kubeClient *kubernetes.Clientset) {
-	list, err := kubeClient.Core().Pods("").List(api.ListOptions{})
+func deleteDeployment(kubeClient *unversioned.Client) {
+	// Get deployments to delete
+	deploymentlist, err := kubeClient.Deployments(api.NamespaceDefault).List(api.ListOptions{})
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("(2)failed list deployments: %v", err)
 	}
-	for _, resource := range list.Items {
-		startTime := resource.GetCreationTimestamp()
-		ttl, err := strconv.ParseFloat(resource.Labels["ttl"], 64)
+
+	for _, deployment := range deploymentlist.Items {
+		startTime := deployment.GetCreationTimestamp()
+		if startTime.IsZero() {
+			continue
+		}
+		ttl, err := strconv.ParseFloat(deployment.Labels["ttl"], 64)
 		if err != nil {
 			continue
 		}
 
-		resourceAge := time.Now().Sub(startTime.Time)
-		resourceAgeHours := resourceAge.Hours()
-		if resourceAgeHours <= ttl {
-			log.Println(resource.Name, "is", int(resourceAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
+		deploymentAge := time.Now().Sub(startTime.Time)
+		deploymentAgeHours := deploymentAge.Hours()
+		if deploymentAgeHours <= ttl {
+			log.Println("Deployment", deployment.Name, "is", int(deploymentAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
 			continue
 		}
 
-		// Delete Resource
-		fmt.Println("Attempting to kill", resource.Name, "it is older then", ttl, "hours")
-		err = kubeClient.Pods(resource.Namespace).Delete(resource.Name, &api.DeleteOptions{})
+		// Delete Deployment
+		fmt.Println("Attempting to kill deployment", deployment.Name, "it is older then", ttl, "hours")
+
+		err = kubeClient.Deployments(deployment.Namespace).Delete(deployment.Name, &api.DeleteOptions{})
+
 		if err != nil {
-			log.Printf("%v was deleted\n", resource.Name)
+			log.Printf("Deployment %v was deleted\n", deployment.Name)
 		}
 	}
 }
 
-func deleteServices(kubeClient *kubernetes.Clientset) {
-	list, err := kubeClient.Core().Services("").List(api.ListOptions{})
+func deleteReplicaSet(kubeClient *unversioned.Client) {
+	// Get Replica Sets to delete
+	rslist, err := kubeClient.ReplicaSets(api.NamespaceDefault).List(api.ListOptions{})
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("(2)failed list replica sets: %v", err)
 	}
-	for _, resource := range list.Items {
-		startTime := resource.GetCreationTimestamp()
-		ttl, err := strconv.ParseFloat(resource.Labels["ttl"], 64)
+
+	for _, rs := range rslist.Items {
+		startTime := rs.GetCreationTimestamp()
+		if startTime.IsZero() {
+			continue
+		}
+		ttl, err := strconv.ParseFloat(rs.Labels["ttl"], 64)
 		if err != nil {
 			continue
 		}
 
-		resourceAge := time.Now().Sub(startTime.Time)
-		resourceAgeHours := resourceAge.Hours()
-		if resourceAgeHours <= ttl {
-			log.Println(resource.Name, "is", int(resourceAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
+		rsAge := time.Now().Sub(startTime.Time)
+		rsAgeHours := rsAge.Hours()
+		if rsAgeHours <= ttl {
+			log.Println("Replica Set", rs.Name, "is", int(rsAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
 			continue
 		}
 
-		// Delete Resource
-		fmt.Println("Attempting to kill", resource.Name, "it is older then", ttl, "hours")
-		err = kubeClient.Services(resource.Namespace).Delete(resource.Name, &api.DeleteOptions{})
-		if err != nil {
-			log.Printf("%v was deleted\n", resource.Name)
-		}
-	}
-}
-func deleteDeployments(kubeClient *kubernetes.Clientset) {
-	list, err := kubeClient.Deployments("").List(api.ListOptions{})
-	if err != nil {
-		panic(err.Error())
-	}
-	for _, resource := range list.Items {
-		startTime := resource.GetCreationTimestamp()
-		ttl, err := strconv.ParseFloat(resource.Labels["ttl"], 64)
-		if err != nil {
-			continue
-		}
+		// Delete Replica Set
+		fmt.Println("Attempting to kill replica set", rs.Name, "it is older then", ttl, "hours")
 
-		resourceAge := time.Now().Sub(startTime.Time)
-		resourceAgeHours := resourceAge.Hours()
-		if resourceAgeHours <= ttl {
-			log.Println(resource.Name, "is", int(resourceAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
-			continue
-		}
+		err = kubeClient.ReplicaSets(rs.Namespace).Delete(rs.Name, &api.DeleteOptions{})
 
-		// Delete Resource
-		fmt.Println("Attempting to kill", resource.Name, "it is older then", ttl, "hours")
-		err = kubeClient.Deployments(resource.Namespace).Delete(resource.Name, &api.DeleteOptions{})
 		if err != nil {
-			log.Printf("%v was deleted\n", resource.Name)
+			log.Printf("Replica Set %v was deleted\n", rs.Name)
 		}
 	}
 }
 
-func deleteIngresses(kubeClient *kubernetes.Clientset) {
-	list, err := kubeClient.Ingresses("").List(api.ListOptions{})
+func deletePod(kubeClient *unversioned.Client) {
+	// Get pods to delete
+	podlist, err := kubeClient.Pods(api.NamespaceDefault).List(api.ListOptions{})
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("(2)failed list pods: %v", err)
 	}
-	for _, resource := range list.Items {
-		startTime := resource.GetCreationTimestamp()
-		ttl, err := strconv.ParseFloat(resource.Labels["ttl"], 64)
+
+	for _, pod := range podlist.Items {
+		startTime := pod.Status.StartTime
+		if startTime.IsZero() {
+			continue
+		}
+		ttl, err := strconv.ParseFloat(pod.Labels["ttl"], 64)
 		if err != nil {
 			continue
 		}
 
-		resourceAge := time.Now().Sub(startTime.Time)
-		resourceAgeHours := resourceAge.Hours()
-		if resourceAgeHours <= ttl {
-			log.Println(resource.Name, "is", int(resourceAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
+		podAge := time.Now().Sub(startTime.Time)
+		podAgeHours := podAge.Hours()
+		if podAgeHours <= ttl {
+			log.Println("Pod", pod.Name, "is", int(podAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
 			continue
 		}
 
-		// Delete Resource
-		fmt.Println("Attempting to kill", resource.Name, "it is older then", ttl, "hours")
-		err = kubeClient.Ingresses(resource.Namespace).Delete(resource.Name, &api.DeleteOptions{})
+		// Delete Pod
+		fmt.Println("Attempting to kill pod", pod.Name, "it is older then", ttl, "hours")
+		err = kubeClient.Pods(pod.Namespace).Delete(pod.Name, &api.DeleteOptions{})
 		if err != nil {
-			log.Printf("%v was deleted\n", resource.Name)
+			log.Printf("Pod %v was deleted\n", pod)
+		}
+	}
+}
+
+func deleteService(kubeClient *unversioned.Client) {
+	// Get service to delete
+	servicelist, err := kubeClient.Services(api.NamespaceDefault).List(api.ListOptions{})
+	if err != nil {
+		log.Fatalf("(2)failed list service: %v", err)
+	}
+
+	for _, service := range servicelist.Items {
+		ttl, err := strconv.ParseFloat(service.Labels["ttl"], 64)
+		if err != nil {
+			continue
+		}
+		serviceCreation := service.GetCreationTimestamp().Time
+		if serviceCreation.IsZero() {
+			continue
+		}
+		serviceAge := time.Now().Sub(serviceCreation)
+		if serviceAge.Hours() <= ttl {
+			log.Println("Service", service.Name, "is", int(serviceAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
+			continue
+		}
+
+		// Delete Service
+		fmt.Println("Attempting to kill service", service.Name, "it is older then", ttl, "hours")
+		err = kubeClient.Services(service.Namespace).Delete(service.Name)
+		if err != nil {
+			log.Printf("Service %v was deleted\n", service.Name)
+		}
+	}
+}
+
+func deleteIngress(kubeClient *unversioned.Client) {
+	// Get ingress to delete
+	ingresslist, err := kubeClient.Ingress(api.NamespaceDefault).List(api.ListOptions{})
+	if err != nil {
+		log.Fatalf("(2)failed list ingress: %v", err)
+	}
+
+	for _, ingress := range ingresslist.Items {
+		ttl, err := strconv.ParseFloat(ingress.Labels["ttl"], 64)
+		if err != nil {
+			continue
+		}
+		ingressCreation := ingress.GetCreationTimestamp().Time
+		if ingressCreation.IsZero() {
+			continue
+		}
+		ingressAge := time.Now().Sub(ingressCreation)
+		if ingressAge.Hours() <= ttl {
+			log.Println("Ingress", ingress.Name, "is", int(ingressAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
+			continue
+		}
+
+		// Delete Ingress
+		fmt.Println("Attempting to kill ingress", ingress.Name, "it is older then", ttl, "hours")
+		err = kubeClient.Ingress(ingress.Namespace).Delete(ingress.Name, &api.DeleteOptions{})
+		if err != nil {
+			log.Printf("Ingress %v was deleted\n", ingress.Name)
 		}
 	}
 }
 
 func main() {
 	fmt.Printf("Karousel(%s) Started...Please stand by for ascension\n", Version)
-	config, err := rest.InClusterConfig()
+	flags.AddGoFlagSet(flag.CommandLine)
+	flags.Parse(os.Args)
+	clientConfig := kubectl_util.DefaultClientConfig(flags)
+
+	config, err := clientConfig.ClientConfig()
 	if err != nil {
-		panic(err.Error())
+		log.Fatalf("error connecting to the client: %v", err)
 	}
-	kubeClient, err := kubernetes.NewForConfig(config)
+
+	kubeClient, err := unversioned.New(config)
 	if err != nil {
 		log.Fatalf("failed to create client: %v", err)
 	}
-	fmt.Printf("Value: %v Error: %v", kubeClient, err)
+
 	for {
-		deleteDeployments(kubeClient)
-		deletePods(kubeClient)
-		deleteServices(kubeClient)
-		deleteIngresses(kubeClient)
-		time.Sleep(time.Second * 300)
+		deleteDeployment(kubeClient)
+		deleteReplicaSet(kubeClient)
+		deletePod(kubeClient)
+		deleteService(kubeClient)
+		deleteIngress(kubeClient)
+		time.Sleep(300 * time.Second)
 	}
 }
