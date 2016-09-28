@@ -1,8 +1,8 @@
 ![bespoked](logo.png)
 
-# karousel
+# Usage
 
-A utility to delete "expired" resources from a kubernetes cluster.
+Karousel uses a meta data field "ttl" (Time to Live) to determine how long (in hours) before a resource is deleted.  See examples directory for sample yaml. 
 
 # Local Testing
 
