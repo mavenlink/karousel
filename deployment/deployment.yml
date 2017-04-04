@@ -12,6 +12,7 @@ spec:
     spec:
       containers:
       - name: karousel
-        image: docker.repo.mvn.link/karousel:unversioned-incluster
+        image: karousel:latest
+        imagePullPolicy: IfNotPresent
       imagePullSecrets:
         - name: dockercfgjson
