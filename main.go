@@ -37,7 +37,7 @@ func deletePod(clientset *kubernetes.Clientset) {
 		if startTime.IsZero() {
 			continue
 		}
-		ttl, err := strconv.ParseFloat(pod.Labels["ttl"], 64)
+		ttl, err := strconv.ParseFloat(pod.Annotations["ttl"], 64)
 		if err != nil {
 			continue
 		}
@@ -72,7 +72,7 @@ func deleteService(clientset *kubernetes.Clientset) {
 		if startTime.IsZero() {
 			continue
 		}
-		ttl, err := strconv.ParseFloat(service.Labels["ttl"], 64)
+		ttl, err := strconv.ParseFloat(service.Annotations["ttl"], 64)
 		if err != nil {
 			continue
 		}
@@ -107,7 +107,7 @@ func deleteReplicaSet(clientset *kubernetes.Clientset) {
 		if startTime.IsZero() {
 			continue
 		}
-		ttl, err := strconv.ParseFloat(replicaset.Labels["ttl"], 64)
+		ttl, err := strconv.ParseFloat(replicaset.Annotations["ttl"], 64)
 		if err != nil {
 			continue
 		}
@@ -142,7 +142,7 @@ func deleteIngress(clientset *kubernetes.Clientset) {
 		if startTime.IsZero() {
 			continue
 		}
-		ttl, err := strconv.ParseFloat(ingress.Labels["ttl"], 64)
+		ttl, err := strconv.ParseFloat(ingress.Annotations["ttl"], 64)
 		if err != nil {
 			continue
 		}
@@ -177,7 +177,7 @@ func deleteDeployment(clientset *kubernetes.Clientset) {
 		if startTime.IsZero() {
 			continue
 		}
-		ttl, err := strconv.ParseFloat(deployment.Labels["ttl"], 64)
+		ttl, err := strconv.ParseFloat(deployment.Annotations["ttl"], 64)
 		if err != nil {
 			continue
 		}
