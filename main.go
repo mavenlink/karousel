@@ -202,6 +202,7 @@ func deleteDeployment(clientset *kubernetes.Clientset) {
 }
 
 func main() {
+	fmt.Printf("Karousel(%s) Started...Please stand by for ascension\n", Version)
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
