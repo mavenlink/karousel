@@ -25,6 +25,10 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+var (
+	Version = "No Version Provided"
+)
+
 func deletePod(clientset *kubernetes.Clientset) {
 	// Get pods to delete
 	podlist, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
