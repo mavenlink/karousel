@@ -37,16 +37,14 @@ func deletePod(clientset *kubernetes.Clientset) {
 	}
 
 	for _, pod := range podlist.Items {
-		startTime := pod.GetCreationTimestamp()
-		if startTime.IsZero() {
-			continue
-		}
+		dt, err := strconv.ParseInt(pod.Annotations["deployTime"], 10, 64)
+		startTime := time.Unix(dt, 64)
 		ttl, err := strconv.ParseFloat(pod.Annotations["ttl"], 64)
 		if err != nil {
 			continue
 		}
 
-		podAge := time.Now().Sub(startTime.Time)
+		podAge := time.Now().Sub(startTime)
 		podAgeHours := podAge.Hours()
 		if podAgeHours <= ttl {
 			log.Println("Pod", pod.Name, "is", int(podAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
@@ -72,16 +70,14 @@ func deleteService(clientset *kubernetes.Clientset) {
 	}
 
 	for _, service := range servicelist.Items {
-		startTime := service.GetCreationTimestamp()
-		if startTime.IsZero() {
-			continue
-		}
+		dt, err := strconv.ParseInt(service.Annotations["deployTime"], 10, 64)
+		startTime := time.Unix(dt, 64)
 		ttl, err := strconv.ParseFloat(service.Annotations["ttl"], 64)
 		if err != nil {
 			continue
 		}
 
-		serviceAge := time.Now().Sub(startTime.Time)
+		serviceAge := time.Now().Sub(startTime)
 		serviceAgeHours := serviceAge.Hours()
 		if serviceAgeHours <= ttl {
 			log.Println("Service", service.Name, "is", int(serviceAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
@@ -107,16 +103,14 @@ func deleteReplicaSet(clientset *kubernetes.Clientset) {
 	}
 
 	for _, replicaset := range replicasetlist.Items {
-		startTime := replicaset.GetCreationTimestamp()
-		if startTime.IsZero() {
-			continue
-		}
+		dt, err := strconv.ParseInt(replicaset.Annotations["deployTime"], 10, 64)
+		startTime := time.Unix(dt, 64)
 		ttl, err := strconv.ParseFloat(replicaset.Annotations["ttl"], 64)
 		if err != nil {
 			continue
 		}
 
-		replicasetAge := time.Now().Sub(startTime.Time)
+		replicasetAge := time.Now().Sub(startTime)
 		replicasetAgeHours := replicasetAge.Hours()
 		if replicasetAgeHours <= ttl {
 			log.Println("Replicaset", replicaset.Name, "is", int(replicasetAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
@@ -142,16 +136,14 @@ func deleteIngress(clientset *kubernetes.Clientset) {
 	}
 
 	for _, ingress := range ingresslist.Items {
-		startTime := ingress.GetCreationTimestamp()
-		if startTime.IsZero() {
-			continue
-		}
+		dt, err := strconv.ParseInt(ingress.Annotations["deployTime"], 10, 64)
+		startTime := time.Unix(dt, 64)
 		ttl, err := strconv.ParseFloat(ingress.Annotations["ttl"], 64)
 		if err != nil {
 			continue
 		}
 
-		ingressAge := time.Now().Sub(startTime.Time)
+		ingressAge := time.Now().Sub(startTime)
 		ingressAgeHours := ingressAge.Hours()
 		if ingressAgeHours <= ttl {
 			log.Println("Ingress", ingress.Name, "is", int(ingressAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
@@ -177,16 +169,14 @@ func deleteDeployment(clientset *kubernetes.Clientset) {
 	}
 
 	for _, deployment := range deploymentlist.Items {
-		startTime := deployment.GetCreationTimestamp()
-		if startTime.IsZero() {
-			continue
-		}
+		dt, err := strconv.ParseInt(deployment.Annotations["deployTime"], 10, 64)
+		startTime := time.Unix(dt, 64)
 		ttl, err := strconv.ParseFloat(deployment.Annotations["ttl"], 64)
 		if err != nil {
 			continue
 		}
 
-		deploymentAge := time.Now().Sub(startTime.Time)
+		deploymentAge := time.Now().Sub(startTime)
 		deploymentAgeHours := deploymentAge.Hours()
 		if deploymentAgeHours <= ttl {
 			log.Println("Deployment", deployment.Name, "is", int(deploymentAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
