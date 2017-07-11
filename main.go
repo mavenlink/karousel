@@ -41,7 +41,8 @@ func deletePod(clientset *kubernetes.Clientset) {
 		if err != nil {
 			continue
 		}
-		startTime := time.Unix(dt, 64)
+		var i int64 = int64(dt)
+		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(pod.Annotations["ttl"], 64)
 		if err != nil {
 			continue
@@ -77,7 +78,8 @@ func deleteService(clientset *kubernetes.Clientset) {
 		if err != nil {
 			continue
 		}
-		startTime := time.Unix(dt, 64)
+		var i int64 = int64(dt)
+		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(service.Annotations["ttl"], 64)
 		if err != nil {
 			continue
@@ -113,7 +115,8 @@ func deleteReplicaSet(clientset *kubernetes.Clientset) {
 		if err != nil {
 			continue
 		}
-		startTime := time.Unix(dt, 64)
+		var i int64 = int64(dt)
+		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(replicaset.Annotations["ttl"], 64)
 		if err != nil {
 			continue
@@ -149,7 +152,8 @@ func deleteIngress(clientset *kubernetes.Clientset) {
 		if err != nil {
 			continue
 		}
-		startTime := time.Unix(dt, 64)
+		var i int64 = int64(dt)
+		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(ingress.Annotations["ttl"], 64)
 		if err != nil {
 			continue
@@ -185,7 +189,8 @@ func deleteDeployment(clientset *kubernetes.Clientset) {
 		if err != nil {
 			continue
 		}
-		startTime := time.Unix(dt, 64)
+		var i int64 = int64(dt)
+		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(deployment.Annotations["ttl"], 64)
 		if err != nil {
 			continue
