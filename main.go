@@ -39,14 +39,14 @@ func deletePod(clientset *kubernetes.Clientset) {
 	for _, pod := range podlist.Items {
 		dt, err := strconv.ParseFloat(pod.Annotations["deployTime"], 64)
 		if err != nil {
-			log.Printf("(2)failed to parse int for pod %v  %v", pod.Name, err)
+			log.Printf("(2)failed to parse deployTime for pod %v: %v", pod.Name, err)
 			continue
 		}
 		var i int64 = int64(dt)
 		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(pod.Annotations["ttl"], 64)
 		if err != nil {
-			log.Printf("(2)failed to parse float for pod %v  %v", pod.Name, err)
+			log.Printf("(2)failed to parse ttl for pod %v:  %v", pod.Name, err)
 			continue
 		}
 
@@ -78,14 +78,14 @@ func deleteService(clientset *kubernetes.Clientset) {
 	for _, service := range servicelist.Items {
 		dt, err := strconv.ParseFloat(service.Annotations["deployTime"], 64)
 		if err != nil {
-			log.Printf("(2)failed to parse int for service %v  %v", service.Name, err)
+			log.Printf("(2)failed to parse deployTime for service %v: %v", service.Name, err)
 			continue
 		}
 		var i int64 = int64(dt)
 		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(service.Annotations["ttl"], 64)
 		if err != nil {
-			log.Printf("(2)failed to parse float for service %v  %v", service.Name, err)
+			log.Printf("(2)failed to parse ttl for service %v: %v", service.Name, err)
 			continue
 		}
 
@@ -117,14 +117,14 @@ func deleteReplicaSet(clientset *kubernetes.Clientset) {
 	for _, replicaset := range replicasetlist.Items {
 		dt, err := strconv.ParseFloat(replicaset.Annotations["deployTime"], 64)
 		if err != nil {
-			log.Printf("(2)failed to parse int for service %v  %v", replicaset.Name, err)
+			log.Printf("(2)failed to parse deployTime for service %v: %v", replicaset.Name, err)
 			continue
 		}
 		var i int64 = int64(dt)
 		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(replicaset.Annotations["ttl"], 64)
 		if err != nil {
-			log.Printf("(2)failed to parse float for service %v  %v", replicaset.Name, err)
+			log.Printf("(2)failed to parse ttl for service %v: %v", replicaset.Name, err)
 			continue
 		}
 
@@ -156,14 +156,14 @@ func deleteIngress(clientset *kubernetes.Clientset) {
 	for _, ingress := range ingresslist.Items {
 		dt, err := strconv.ParseFloat(ingress.Annotations["deployTime"], 64)
 		if err != nil {
-			log.Printf("(2)failed to parse float for ingress %v  %v", ingress.Name, err)
+			log.Printf("(2)failed to parse deployTime for ingress %v: %v", ingress.Name, err)
 			continue
 		}
 		var i int64 = int64(dt)
 		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(ingress.Annotations["ttl"], 64)
 		if err != nil {
-			log.Printf("(2)failed to parse float for ingress %v  %v", ingress.Name, err)
+			log.Printf("(2)failed to parse ttl for ingress %v: %v", ingress.Name, err)
 			continue
 		}
 
@@ -195,14 +195,14 @@ func deleteDeployment(clientset *kubernetes.Clientset) {
 	for _, deployment := range deploymentlist.Items {
 		dt, err := strconv.ParseFloat(deployment.Annotations["deployTime"], 64)
 		if err != nil {
-			log.Printf("(2)failed to parse float for deployment %v  %v", deployment.Name, err)
+			log.Printf("(2)failed to parse deployTime for deployment %v: %v", deployment.Name, err)
 			continue
 		}
 		var i int64 = int64(dt)
 		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(deployment.Annotations["ttl"], 64)
 		if err != nil {
-			log.Printf("(2)failed to parse float for deployment %v  %v", deployment.Name, err)
+			log.Printf("(2)failed to parse ttl for deployment %v: %v", deployment.Name, err)
 			continue
 		}
 
