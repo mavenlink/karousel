@@ -33,20 +33,20 @@ func deletePod(clientset *kubernetes.Clientset) {
 	// Get pods to delete
 	podlist, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
 	if err != nil {
-		log.Fatalf("(2)failed list pods: %v", err)
+		log.Println("(2)failed list pods: %v", err)
 	}
 
 	for _, pod := range podlist.Items {
 		dt, err := strconv.ParseInt(pod.Annotations["deployTime"], 10, 64)
 		if err != nil {
-			log.Fatalf("(2)failed to parse int: %v", err)
+			log.Printf("(2)failed to parse int: %v", err)
 			continue
 		}
 		var i int64 = int64(dt)
 		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(pod.Annotations["ttl"], 64)
 		if err != nil {
-			log.Fatalf("(2)failed to parse float: %v", err)
+			log.Printf("(2)failed to parse float: %v", err)
 			continue
 		}
 
@@ -78,14 +78,14 @@ func deleteService(clientset *kubernetes.Clientset) {
 	for _, service := range servicelist.Items {
 		dt, err := strconv.ParseInt(service.Annotations["deployTime"], 10, 64)
 		if err != nil {
-			log.Fatalf("(2)failed to parse int: %v", err)
+			log.Printf("(2)failed to parse int: %v", err)
 			continue
 		}
 		var i int64 = int64(dt)
 		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(service.Annotations["ttl"], 64)
 		if err != nil {
-			log.Fatalf("(2)failed to parse float: %v", err)
+			log.Printf("(2)failed to parse float: %v", err)
 			continue
 		}
 
@@ -117,14 +117,14 @@ func deleteReplicaSet(clientset *kubernetes.Clientset) {
 	for _, replicaset := range replicasetlist.Items {
 		dt, err := strconv.ParseInt(replicaset.Annotations["deployTime"], 10, 64)
 		if err != nil {
-			log.Fatalf("(2)failed to parse int: %v", err)
+			log.Printf("(2)failed to parse int: %v", err)
 			continue
 		}
 		var i int64 = int64(dt)
 		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(replicaset.Annotations["ttl"], 64)
 		if err != nil {
-			log.Fatalf("(2)failed to parse float: %v", err)
+			log.Printf("(2)failed to parse float: %v", err)
 			continue
 		}
 
@@ -156,14 +156,14 @@ func deleteIngress(clientset *kubernetes.Clientset) {
 	for _, ingress := range ingresslist.Items {
 		dt, err := strconv.ParseInt(ingress.Annotations["deployTime"], 10, 64)
 		if err != nil {
-			log.Fatalf("(2)failed to parse int: %v", err)
+			log.Printf("(2)failed to parse int: %v", err)
 			continue
 		}
 		var i int64 = int64(dt)
 		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(ingress.Annotations["ttl"], 64)
 		if err != nil {
-			log.Fatalf("(2)failed to parse float: %v", err)
+			log.Printf("(2)failed to parse float: %v", err)
 			continue
 		}
 
@@ -195,14 +195,14 @@ func deleteDeployment(clientset *kubernetes.Clientset) {
 	for _, deployment := range deploymentlist.Items {
 		dt, err := strconv.ParseInt(deployment.Annotations["deployTime"], 10, 64)
 		if err != nil {
-			log.Fatalf("(2)failed to parse int: %v", err)
+			log.Printf("(2)failed to parse int: %v", err)
 			continue
 		}
 		var i int64 = int64(dt)
 		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(deployment.Annotations["ttl"], 64)
 		if err != nil {
-			log.Fatalf("(2)failed to parse float: %v", err)
+			log.Printf("(2)failed to parse float: %v", err)
 			continue
 		}
 
