@@ -10,8 +10,8 @@ metadata:
   name: karousel
   labels:
 rules:
-- apiGroups: [""]
-  resources: ["deployments", "replicasets", "pods", "services", "ingress"]
+- apiGroups: ["", "extensions"]
+  resources: ["deployments", "replicasets", "pods", "services", "ingresses"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 ---
 kind: ClusterRoleBinding
