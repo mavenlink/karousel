@@ -28,7 +28,7 @@ jobs:
           command: |
             set -e
             env
-            cd $CIRCLE_WORKING_DIRECTORY
+            # cd $CIRCLE_WORKING_DIRECTORY
             pwd
             whoami
 
