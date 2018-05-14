@@ -14,5 +14,5 @@ spec:
       automountServiceAccountToken: true
       containers:
       - name: karousel
-        image: karousel:mine01
+        image: mavenlink/karousel:latest
         imagePullPolicy: IfNotPresent
