@@ -11,7 +11,7 @@ defaults: &defaults
   environment: &environment_defaults
     FOO: "bar"
   docker:
-    - image: &bootstrap_image 673102273038.dkr.ecr.us-west-2.amazonaws.com/trusty-bootstrap:$CIRCLE_SHA1
+    - image: circleci/golang:1.10
 
 version: 2
 jobs:
