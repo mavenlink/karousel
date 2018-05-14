@@ -7,7 +7,7 @@ workflows:
       - build
 
 defaults: &defaults
-  working_directory: /home/app/current
+  # working_directory: /home/app/current
   environment: &environment_defaults
     FOO: "bar"
   docker:
