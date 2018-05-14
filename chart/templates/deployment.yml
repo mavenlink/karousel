@@ -10,9 +10,9 @@ spec:
       labels:
         app: karousel
     spec:
+      serviceAccountName: karousel
+      automountServiceAccountToken: true
       containers:
       - name: karousel
-        image: karousel:latest
+        image: karousel:mine01
         imagePullPolicy: IfNotPresent
-      imagePullSecrets:
-        - name: dockercfgjson

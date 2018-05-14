@@ -1,0 +1,39 @@
+### cache bust
+---
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+
+defaults: &defaults
+  # working_directory: /home/app/current
+  environment: &environment_defaults
+    FOO: "bar"
+  docker:
+    - image: circleci/golang:1.10
+
+version: 2
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - run:
+          name: build
+          command: |
+            set -e
+            env
+            # cd $CIRCLE_WORKING_DIRECTORY
+            pwd
+            whoami
+
+            docker build -t mavenlink/karousel:$CIRCLE_SHA1 .
+
+
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push mavenlink/karousel:$CIRCLE_SHA1
