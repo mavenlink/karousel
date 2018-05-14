@@ -33,20 +33,24 @@ func deletePod(clientset *kubernetes.Clientset) {
 	// Get pods to delete
 	podlist, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
 	if err != nil {
-		log.Fatalf("(2)failed list pods: %v", err)
+		log.Println("(2)failed list pods: %v", err)
 	}
 
 	for _, pod := range podlist.Items {
-		startTime := pod.GetCreationTimestamp()
-		if startTime.IsZero() {
+		dt, err := strconv.ParseFloat(pod.Annotations["deployTime"], 64)
+		if err != nil {
+			log.Printf("(2)failed to parse deployTime for pod %v: %v", pod.Name, err)
 			continue
 		}
+		var i int64 = int64(dt)
+		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(pod.Annotations["ttl"], 64)
 		if err != nil {
+			log.Printf("(2)failed to parse ttl for pod %v:  %v", pod.Name, err)
 			continue
 		}
 
-		podAge := time.Now().Sub(startTime.Time)
+		podAge := time.Now().Sub(startTime)
 		podAgeHours := podAge.Hours()
 		if podAgeHours <= ttl {
 			log.Println("Pod", pod.Name, "is", int(podAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
@@ -72,16 +76,20 @@ func deleteService(clientset *kubernetes.Clientset) {
 	}
 
 	for _, service := range servicelist.Items {
-		startTime := service.GetCreationTimestamp()
-		if startTime.IsZero() {
+		dt, err := strconv.ParseFloat(service.Annotations["deployTime"], 64)
+		if err != nil {
+			log.Printf("(2)failed to parse deployTime for service %v: %v", service.Name, err)
 			continue
 		}
+		var i int64 = int64(dt)
+		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(service.Annotations["ttl"], 64)
 		if err != nil {
+			log.Printf("(2)failed to parse ttl for service %v: %v", service.Name, err)
 			continue
 		}
 
-		serviceAge := time.Now().Sub(startTime.Time)
+		serviceAge := time.Now().Sub(startTime)
 		serviceAgeHours := serviceAge.Hours()
 		if serviceAgeHours <= ttl {
 			log.Println("Service", service.Name, "is", int(serviceAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
@@ -107,16 +115,20 @@ func deleteReplicaSet(clientset *kubernetes.Clientset) {
 	}
 
 	for _, replicaset := range replicasetlist.Items {
-		startTime := replicaset.GetCreationTimestamp()
-		if startTime.IsZero() {
+		dt, err := strconv.ParseFloat(replicaset.Annotations["deployTime"], 64)
+		if err != nil {
+			log.Printf("(2)failed to parse deployTime for service %v: %v", replicaset.Name, err)
 			continue
 		}
+		var i int64 = int64(dt)
+		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(replicaset.Annotations["ttl"], 64)
 		if err != nil {
+			log.Printf("(2)failed to parse ttl for service %v: %v", replicaset.Name, err)
 			continue
 		}
 
-		replicasetAge := time.Now().Sub(startTime.Time)
+		replicasetAge := time.Now().Sub(startTime)
 		replicasetAgeHours := replicasetAge.Hours()
 		if replicasetAgeHours <= ttl {
 			log.Println("Replicaset", replicaset.Name, "is", int(replicasetAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
@@ -142,16 +154,20 @@ func deleteIngress(clientset *kubernetes.Clientset) {
 	}
 
 	for _, ingress := range ingresslist.Items {
-		startTime := ingress.GetCreationTimestamp()
-		if startTime.IsZero() {
+		dt, err := strconv.ParseFloat(ingress.Annotations["deployTime"], 64)
+		if err != nil {
+			log.Printf("(2)failed to parse deployTime for ingress %v: %v", ingress.Name, err)
 			continue
 		}
+		var i int64 = int64(dt)
+		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(ingress.Annotations["ttl"], 64)
 		if err != nil {
+			log.Printf("(2)failed to parse ttl for ingress %v: %v", ingress.Name, err)
 			continue
 		}
 
-		ingressAge := time.Now().Sub(startTime.Time)
+		ingressAge := time.Now().Sub(startTime)
 		ingressAgeHours := ingressAge.Hours()
 		if ingressAgeHours <= ttl {
 			log.Println("Ingress", ingress.Name, "is", int(ingressAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
@@ -177,16 +193,20 @@ func deleteDeployment(clientset *kubernetes.Clientset) {
 	}
 
 	for _, deployment := range deploymentlist.Items {
-		startTime := deployment.GetCreationTimestamp()
-		if startTime.IsZero() {
+		dt, err := strconv.ParseFloat(deployment.Annotations["deployTime"], 64)
+		if err != nil {
+			log.Printf("(2)failed to parse deployTime for deployment %v: %v", deployment.Name, err)
 			continue
 		}
+		var i int64 = int64(dt)
+		startTime := time.Unix(i, 64)
 		ttl, err := strconv.ParseFloat(deployment.Annotations["ttl"], 64)
 		if err != nil {
+			log.Printf("(2)failed to parse ttl for deployment %v: %v", deployment.Name, err)
 			continue
 		}
 
-		deploymentAge := time.Now().Sub(startTime.Time)
+		deploymentAge := time.Now().Sub(startTime)
 		deploymentAgeHours := deploymentAge.Hours()
 		if deploymentAgeHours <= ttl {
 			log.Println("Deployment", deployment.Name, "is", int(deploymentAge.Hours()), "hours old, it will be deleted in", ttl, "hours")
