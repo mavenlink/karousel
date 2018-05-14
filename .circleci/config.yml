@@ -3,7 +3,8 @@
 workflows:
   version: 2
   build:
-    - build
+    jobs:
+      - build
 
 defaults: &defaults
   working_directory: /home/app/current
