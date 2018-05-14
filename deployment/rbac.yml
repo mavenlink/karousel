@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: karousel
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: karousel
+  labels:
+rules:
+- apiGroups: [""]
+  resources: ["deployments", "replicasets", "pods", "services", "ingress"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: karousel-binding
+subjects:
+- kind: ServiceAccount
+  name: karousel
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: karousel
+  apiGroup: rbac.authorization.k8s.io
